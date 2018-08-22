@@ -1,0 +1,242 @@
+
+swagger: '2.0'
+info:
+  title: MASDriverCodeInquiry
+  description: Driver Code Inquiry Rest API to fetch Driver/Helper Details for different Libraries in MAS.
+  version: "0.0.1"
+  contact: 
+    email: "prao1@wm.com"
+# the domain of the service
+host: maswebsvcssit.wm.com
+# array of all schemes that your API supports
+schemes:
+  - https
+# will be prefixed to all paths
+basePath: /MASDriverCodeInquiry/services/MASDriverCodeInquiry
+produces:
+  - application/json
+paths:
+  /{SourceSystemId}/{MASLibrarySuffix}:
+    get:
+      summary: Driver Codes for the given Library sorted by driver code.
+      description: |
+        This endpoint returns information about the Driver/Helper
+        as per areas grouped in the MAS Library. The response includes the Driver Code, Employee ID, Name and Status along with other details ordered by Driver Code.
+      parameters:
+        - name: SourceSystemId
+          in: path
+          description: Source System ID.
+          required: true
+          type: string
+          
+        - name: MASLibrarySuffix
+          in: path
+          description: MAS Library Suffix
+          required: true
+          type: string
+         
+      
+      responses:
+        200:
+          description: OK
+          schema:
+              $ref: '#/definitions/Drivers'
+        204:
+          description: Requested Library was not found
+        504:
+          description: Could not get connection from data source java:comp/env/jdbc/MASDriverCodeInquiryDB
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /{SourceSystemId}:
+    get:
+      summary: Driver Codes for the all the Libraries sorted by Library and then by driver code.
+      description: |
+        This endpoint returns information about the Driver/Helper
+        as per areas grouped in the MAS Library. The response includes the Driver Code, Employee ID, Name and Status along with other details ordered by Library and then by Driver Code.
+      parameters:
+        - name: SourceSystemId
+          in: path
+          description: Source System ID.
+          required: true
+          type: string
+       
+      responses:
+        200:
+          description: An Object with an array of Driver attributes
+          schema:
+            $ref: '#/definitions/Libraries'
+        504:
+          description: Could not get connection from data source java:comp/env/jdbc/MASDriverCodeInquiryDB
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /{SourceSystemId}/{MASLibrarySuffix}/paginate:
+    get:
+      summary: Driver Codes for the given Library sorted by driver code.
+      description: |
+        This endpoint returns information about the Driver/Helper
+        as per areas grouped in the MAS Library. The response includes the Driver Code, Employee ID, Name and Status along with other details ordered by Driver Code.
+      parameters:
+        - name: SourceSystemId
+          in: path
+          description: Source System ID.
+          required: true
+          type: string
+          
+        - name: MASLibrarySuffix
+          in: path
+          description: MAS Library Suffix
+          required: true
+          type: string
+          
+        - name: limit
+          in: query
+          description: The number of items per request
+          type: string
+          
+        - name: offset
+          in: query
+          type: integer
+          description: The number of items to skip
+          
+        - name: filter
+          in: query
+          type: string
+          description: filter driver code
+         
+      
+      responses:
+        200:
+          description: OK
+          schema:
+              $ref: '#/definitions/Drivers'
+        204:
+          description: Requested Library was not found
+        504:
+          description: Could not get connection from data source java:comp/env/jdbc/MASDriverCodeInquiryDB
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /{SourceSystemId}/paginate:
+    get:
+      summary: Driver Codes for the given Library sorted by driver code.
+      description: |
+        This endpoint returns information about the Driver/Helper
+        as per areas grouped in the MAS Library. The response includes the Driver Code, Employee ID, Name and Status along with other details ordered by Driver Code.
+      parameters:
+        - name: SourceSystemId
+          in: path
+          description: Source System ID.
+          required: true
+          type: string
+          
+        - name: limit
+          in: query
+          description: The number of items per request
+          type: string
+          
+        - name: offset
+          in: query
+          type: integer
+          description: The number of items to skip
+          
+        - name: filter
+          in: query
+          type: string
+          description: filter driver code
+         
+      
+      responses:
+        200:
+          description: OK
+          headers:
+            X-Total-Count:
+              type: integer
+              description: Total items available
+          
+          schema:
+              $ref: '#/definitions/Drivers'
+        204:
+          description: Requested Library was not found
+        504:
+          description: Could not get connection from data source java:comp/env/jdbc/MASDriverCodeInquiryDB
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  
+definitions:
+  Driver:
+    type: object
+    properties: 
+      code: 
+        type: "string"
+      description: 
+        type: "string"
+      employeeId: 
+        type: "string"
+      status: 
+        type: "string"
+      status_description:
+        type: "string"
+        
+  Drivers:
+    required:
+    - "drivers"
+    type: object
+    properties: 
+      drivers: 
+        type: "array"
+        items:
+          $ref: '#/definitions/Driver'
+              
+  Libraries:
+    required: 
+    - "libraries"
+    type: object
+    properties: 
+      libraries: 
+        type: "array"
+        items: 
+          type: "object"
+          properties: 
+            name: 
+              type: "string"
+            drivers:
+              type: array
+              items:
+                $ref: '#/definitions/Driver'
+
+      
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
+
+securityDefinitions:
+  basicAuth:
+    type: basic
+    
+    
+security:
+  - basicAuth: [] 
